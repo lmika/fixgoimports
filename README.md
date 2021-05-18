@@ -6,11 +6,12 @@ imports appearing above 3rd party imports.
 ## Usage
 
 ```
-fixgoimports [-w] [FILE_OR_DIR...]
+fixgoimports [-l] [-w] [FILE_OR_DIR...]
 ```
 
 Where:
 
+- `-l`: list the files that differ from the formatted file
 - `-w`: writes the formatted source file back to the original file
 
 When called with arguments, each argument must either be a file or a directory.  Files will be processed as long

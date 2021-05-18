@@ -6,16 +6,18 @@ import (
 )
 
 type errorPresenter struct {
-	errors	int
-}
-
-func (ep *errorPresenter) Warnf(pattern string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, pattern, args...)
+	errors int
 }
 
 func (ep *errorPresenter) Printf(pattern string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, pattern, args...)
+	fmt.Fprintln(os.Stderr)
+}
+
+func (ep *errorPresenter) Errorf(pattern string, args ...interface{}) {
 	ep.errors++
 	fmt.Fprintf(os.Stderr, pattern, args...)
+	fmt.Fprintln(os.Stderr)
 }
 
 func (ep *errorPresenter) Exit() {

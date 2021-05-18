@@ -21,7 +21,7 @@ var blockImportName = regexp.MustCompile(`([.]|[a-zA-Z_][a-zA-Z0-9_]*)?\s*("[^"]
 
 type Import struct {
 	Name     string
-	Alias string
+	Alias    string
 	IsStdLib bool
 }
 
@@ -71,8 +71,7 @@ func NewImport(name, alias string) Import {
 	return Import{Name: name, Alias: alias, IsStdLib: true}
 }
 
-
-type Imports	[]Import
+type Imports []Import
 
 func (imps Imports) SortInPlace() {
 	sort.Slice(imps, func(i, j int) bool {

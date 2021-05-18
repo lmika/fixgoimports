@@ -9,9 +9,9 @@ import (
 )
 
 type GoFile struct {
-	Before string		// Lines before and including 'import ('
+	Before  string  // Lines before and including 'import ('
 	Imports Imports // Lines within 'import (' and ')'
-	After string
+	After   string
 }
 
 func NewGoFile(r io.Reader) (*GoFile, error) {
@@ -54,9 +54,9 @@ func NewGoFile(r io.Reader) (*GoFile, error) {
 	importLines.SortInPlace()
 
 	return &GoFile{
-		Before: before.String(),
+		Before:  before.String(),
 		Imports: importLines,
-		After: after.String(),
+		After:   after.String(),
 	}, nil
 }
 
