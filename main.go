@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"io"
-	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -14,7 +13,7 @@ func main() {
 	var flagDryRun = flag.Bool("N", false, "Dry run")
 	flag.Parse()
 
-	filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
+	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.Name() == "vendor" && info.IsDir() {
 			return filepath.SkipDir
 		}
