@@ -1,4 +1,4 @@
-# fixgoimports
+# format-go-imports
 
 A very simple go importing formatter.  This sorts and groups imports alphabetically with standard library
 imports appearing above 3rd party imports.
@@ -6,7 +6,7 @@ imports appearing above 3rd party imports.
 ## Usage
 
 ```
-fixgoimports [-l] [-w] [FILE_OR_DIR...]
+format-go-imports [-l] [-w] [FILE_OR_DIR...]
 ```
 
 Where:
