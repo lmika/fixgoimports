@@ -15,6 +15,10 @@ func main() {
 	flag.Parse()
 
 	filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
+		if info.Name() == "vendor" && info.IsDir() {
+			return filepath.SkipDir
+		}
+
 		if filepath.Ext(path) == ".go" {
 			if err := processFile(path, *flagDryRun); err != nil {
 				log.Printf("%v: %v", info.Name(), err)
