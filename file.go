@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-	"github.com/pkg/errors"
 	"io"
-	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type GoFile struct {
@@ -14,19 +14,13 @@ type GoFile struct {
 	After string
 }
 
-func NewGoFile(filename string) (*GoFile, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
+func NewGoFile(r io.Reader) (*GoFile, error) {
 	state := 0
 	before := new(strings.Builder)
 	after := new(strings.Builder)
 	importLines := make(Imports, 0)
 
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		trimmedLine := strings.TrimSpace(scanner.Text())
 

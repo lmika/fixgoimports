@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var knownPrefixes = map[string]struct{}{
