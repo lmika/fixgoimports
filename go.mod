@@ -1,4 +1,4 @@
-module github.com/lmika/fixgoimports
+module github.com/lmika/format-go-imports
 
 go 1.14
 
