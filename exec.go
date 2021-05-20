@@ -19,14 +19,18 @@ type executionContext struct {
 
 func (ec executionContext) processDir(dirName string) error {
 	return filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			if !ec.shouldProcessFileOrDir(info) {
+		shouldProcess := ec.shouldProcessFileOrDir(info)
+
+		if !shouldProcess {
+			ec.errorPresenter.Verbosef("ignoring file %v", path)
+			if info.IsDir() {
 				return filepath.SkipDir
+			} else {
+				return nil
 			}
-			return nil
 		}
 
-		if ec.shouldProcessFileOrDir(info) {
+		if !info.IsDir() {
 			if err := ec.processFile(path); err != nil {
 				ec.errorPresenter.Errorf("%v: %v", path, err)
 			}
@@ -36,6 +40,8 @@ func (ec executionContext) processDir(dirName string) error {
 }
 
 func (ec executionContext) processFile(filename string) error {
+	ec.errorPresenter.Verbosef("processing file %v", filename)
+
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return errors.Wrap(err, "cannot read file")
@@ -88,6 +94,11 @@ func (executionContext) processStdin() error {
 
 func (executionContext) shouldProcessFileOrDir(info os.FileInfo) bool {
 	filename := info.Name()
+
+	// Visit the current directory
+	if filename == "." && info.IsDir() {
+		return true
+	}
 
 	// Skip files or directories starting with '.' or '_'
 	if strings.HasPrefix(filename, ".") || strings.HasPrefix(filename, "_") {

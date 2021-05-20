@@ -9,9 +9,12 @@ import (
 func main() {
 	var flagListDifferences = flag.Bool("l", false, "list files that differ from the formatted file")
 	var flagWriteBack = flag.Bool("w", false, "write result to (source) file instead of stdout")
+	var flagVerbose = flag.Bool("v", false, "verbose mode")
 	flag.Parse()
 
-	errs := &errorPresenter{}
+	errs := &errorPresenter{
+		verbose: *flagVerbose,
+	}
 	execContext := executionContext{
 		writeBack:       *flagWriteBack,
 		listFilesDiffer: *flagListDifferences,

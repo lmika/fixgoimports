@@ -6,7 +6,15 @@ import (
 )
 
 type errorPresenter struct {
-	errors int
+	verbose bool
+	errors  int
+}
+
+func (ep *errorPresenter) Verbosef(pattern string, args ...interface{}) {
+	if ep.verbose {
+		fmt.Fprintf(os.Stderr, pattern, args...)
+		fmt.Fprintln(os.Stderr)
+	}
 }
 
 func (ep *errorPresenter) Printf(pattern string, args ...interface{}) {
