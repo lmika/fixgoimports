@@ -29,6 +29,14 @@ var _ = Describe("SrcFile", func() {
 		Expect(srcFile.segments[2]).To(Equal(codeSegment("\nvar somethingAfter int\n")))
 	})
 
+	It("should return an error if a scan error occurred", func() {
+		srcFile := newSrcFileReader([]byte(deindent(`
+			# some invalid character
+		`)))
+
+		Expect(srcFile.scanFile()).To(HaveOccurred())
+	})
+
 	It("properly parse the file with multiple imports", func() {
 		srcFile := newSrcFileReader([]byte(deindent(`
 			var somethingBefore int

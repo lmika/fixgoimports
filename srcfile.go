@@ -12,6 +12,7 @@ type srcFileReader struct {
 	srcBytes []byte
 	fset	*token.FileSet
 	scnr	*scanner.Scanner
+	scanErr error
 
 	nextPos token.Pos
 	nextTok token.Token
@@ -24,9 +25,15 @@ func newSrcFileReader(srcBytes []byte) *srcFileReader {
 	fset := token.NewFileSet()
 	file := fset.AddFile("test.go", 1, len(srcBytes))
 
-	scnr.Init(file, srcBytes, nil, scanner.ScanComments)
+	var srcFileReader = &srcFileReader{srcBytes: srcBytes, fset: fset}
 
-	return &srcFileReader{srcBytes: srcBytes, fset: fset, scnr: &scnr}
+	scnr.Init(file, srcBytes, func(pos token.Position, msg string) {
+		srcFileReader.scanErr = errors.Errorf("scan error: %v", msg)
+	}, scanner.ScanComments)
+
+	srcFileReader.scnr = &scnr
+
+	return srcFileReader
 }
 
 func (sr *srcFileReader) scanNext() {
@@ -64,7 +71,7 @@ func (sr *srcFileReader) scanFile() error {
 		}
 	}
 
-	return nil
+	return sr.scanErr
 }
 
 func (sr *srcFileReader) scanMultilineImport() error {
