@@ -2,9 +2,10 @@ package main
 
 import (
 	"bufio"
+	"strings"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strings"
 )
 
 var _ = Describe("SrcFile", func() {

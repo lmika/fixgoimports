@@ -1,6 +1,8 @@
 package main
 
-import "io"
+import (
+	"io"
+)
 
 type segment interface {
 	format(w io.Writer) error

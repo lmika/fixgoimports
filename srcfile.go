@@ -1,18 +1,19 @@
 package main
 
 import (
-	"github.com/pkg/errors"
 	"go/scanner"
 	"go/token"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 type srcFileReader struct {
-	segments	[]segment
+	segments []segment
 	srcBytes []byte
-	fset	*token.FileSet
-	scnr	*scanner.Scanner
-	scanErr error
+	fset     *token.FileSet
+	scnr     *scanner.Scanner
+	scanErr  error
 
 	nextPos token.Pos
 	nextTok token.Token
@@ -51,7 +52,7 @@ func (sr *srcFileReader) consume(tok token.Token) error {
 	return nil
 }
 
-func (sr *srcFileReader) consumeAny(tok token.Token){
+func (sr *srcFileReader) consumeAny(tok token.Token) {
 	for sr.nextTok == tok {
 		sr.scanNext()
 	}
@@ -129,7 +130,6 @@ func (sr *srcFileReader) nextTokIsThisOrEOF(tok token.Token) bool {
 	return sr.nextTok == tok || sr.nextTok == token.EOF
 }
 
-
 // scanAndCollectUntil collects all bytes from the source bytes up until (but not including) the token
 // has been scanned, or the EOF has been reached
 func (sr *srcFileReader) scanAndCollectUntil(tok token.Token) []byte {
@@ -143,5 +143,3 @@ func (sr *srcFileReader) scanAndCollectUntil(tok token.Token) []byte {
 	endOffset := sr.fset.Position(sr.nextPos).Offset
 	return sr.srcBytes[startOffset:endOffset]
 }
-
-
