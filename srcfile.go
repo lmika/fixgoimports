@@ -67,7 +67,7 @@ func (sr *srcFileReader) scanFile() error {
 			break
 		}
 
-		if err := sr.scanMultilineImport(); err != nil {
+		if err := sr.scanImport(); err != nil {
 			return err
 		}
 	}
@@ -75,10 +75,26 @@ func (sr *srcFileReader) scanFile() error {
 	return sr.scanErr
 }
 
-func (sr *srcFileReader) scanMultilineImport() error {
+func (sr *srcFileReader) scanImport() error {
 	if err := sr.consume(token.IMPORT); err != nil {
 		return err
 	}
+
+	if sr.nextTok == token.LPAREN {
+		return sr.scanMultilineImport()
+	}
+
+	// Single line import
+	imp, err := sr.scanImportExpression()
+	if err != nil {
+		return err
+	}
+
+	sr.segments = append(sr.segments, singleImportSegment{theImport: imp})
+	return nil
+}
+
+func (sr *srcFileReader) scanMultilineImport() error {
 	if err := sr.consume(token.LPAREN); err != nil {
 		return err
 	}

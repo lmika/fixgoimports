@@ -98,6 +98,30 @@ var _ = Describe("SrcFile", func() {
 		Expect(srcFile.segments[4]).To(Equal(codeSegment("\n\nfunc main() { }\n")))
 	})
 
+	It("support single import statements", func() {
+		srcFile := newSrcFileReader([]byte(deindent(`
+			package main
+
+			import "strings"
+			import theThing "example.com/something/else"
+
+			func main() { }
+		`)))
+
+		Expect(srcFile.scanFile()).ToNot(HaveOccurred())
+
+		Expect(srcFile.segments).To(HaveLen(5))
+		Expect(srcFile.segments[0]).To(Equal(codeSegment("package main\n\n")))
+		Expect(srcFile.segments[1]).To(Equal(singleImportSegment{
+			theImport: Import{Name: "strings", IsStdLib: true},
+		}))
+		Expect(srcFile.segments[2]).To(Equal(codeSegment("\n")))
+		Expect(srcFile.segments[3]).To(Equal(singleImportSegment{
+			theImport: Import{Name: "example.com/something/else", IsStdLib: false, Alias: "theThing"},
+		}))
+		Expect(srcFile.segments[4]).To(Equal(codeSegment("\n\nfunc main() { }\n")))
+	})
+
 	It("should not parse strings as if they were imports", func() {
 		srcFile := newSrcFileReader([]byte(deindent(`
 			package main
