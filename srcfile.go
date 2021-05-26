@@ -137,14 +137,4 @@ func (sr *srcFileReader) scanAndCollectUntil(tok token.Token) []byte {
 	return sr.srcBytes[startOffset:endOffset]
 }
 
-func (sr *srcFileReader) scanSegments() {
-}
 
-
-type segment interface {}
-
-type codeSegment string
-
-type multiImportSegment struct {
-	imports []Import
-}

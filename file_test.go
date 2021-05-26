@@ -18,6 +18,7 @@ func formatSource(t *testing.T, src string) string {
 	if err != nil {
 		t.Fatalf("expected no error while parsing but got %v", err)
 	}
+	f.SortImportsInPlace()
 	sw := new(strings.Builder)
 	if err := f.Format(sw); err != nil {
 		t.Fatalf("expected no error while formatting but got %v", err)
