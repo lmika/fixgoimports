@@ -1,30 +1,27 @@
 package main
 
 import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"strings"
-	"testing"
 )
 
-func TestSimple(t *testing.T) {
-	actualFormatted := formatSource(t, simpleSource)
+var _ = Describe("SrcFile", func() {
+	It("should properly format imports", func() {
+		f, err := NewGoFile(strings.NewReader(simpleSource))
+		Expect(err).ToNot(HaveOccurred())
 
-	if actualFormatted != expectedFormatted {
-		t.Fatalf("actual formatted does not match expected: exp = [[%v]], actual = [[%v]]", expectedFormatted, actualFormatted)
-	}
-}
+		f.SortImportsInPlace()
 
-func formatSource(t *testing.T, src string) string {
-	f, err := NewGoFile(strings.NewReader(src))
-	if err != nil {
-		t.Fatalf("expected no error while parsing but got %v", err)
-	}
-	f.SortImportsInPlace()
-	sw := new(strings.Builder)
-	if err := f.Format(sw); err != nil {
-		t.Fatalf("expected no error while formatting but got %v", err)
-	}
-	return sw.String()
-}
+		sw := new(strings.Builder)
+		err = f.Format(sw)
+		Expect(err).ToNot(HaveOccurred())
+
+		actualFormatted := sw.String()
+
+		Expect(actualFormatted).To(Equal(expectedFormatted))
+	})
+})
 
 const simpleSource = `package main
 

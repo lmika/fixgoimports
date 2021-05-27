@@ -3,54 +3,21 @@ package main
 import (
 	"fmt"
 	"io"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
-var knownPrefixes = map[string]struct{}{
+var known3rdPartyPrefixes = map[string]struct{}{
 	"github.com":    {},
 	"bitbucket.org": {},
 	"pkg.go.dev":    {},
 }
 
-var blockImportName = regexp.MustCompile(`([.]|[a-zA-Z_][a-zA-Z0-9_]*)?\s*("[^"]*")`)
-
 type Import struct {
 	Name     string
 	Alias    string
 	IsStdLib bool
-}
-
-var errBlank = errors.New("blank line")
-
-func FromSourceLine(line string) (Import, error) {
-	trimmedLine := strings.TrimSpace(line)
-	if trimmedLine == "" {
-		return Import{}, errBlank
-	}
-
-	submatches := blockImportName.FindStringSubmatch(trimmedLine)
-	var quotedImport, alias string
-	switch len(submatches) {
-	case 2:
-		quotedImport = submatches[1]
-	case 3:
-		alias = submatches[1]
-		quotedImport = submatches[2]
-	default:
-		return Import{}, errors.Errorf("malformed line: %v", submatches)
-	}
-
-	unquotedImport, err := strconv.Unquote(quotedImport)
-	if err != nil {
-		return Import{}, err
-	}
-
-	return NewImport(unquotedImport, alias), nil
 }
 
 func NewImport(name, alias string) Import {
@@ -59,7 +26,7 @@ func NewImport(name, alias string) Import {
 		return Import{Name: name, Alias: alias, IsStdLib: true}
 	}
 
-	if _, isKnownPrefix := knownPrefixes[firstSlash[0]]; isKnownPrefix {
+	if _, isKnown3rdPartyPrefix := known3rdPartyPrefixes[firstSlash[0]]; isKnown3rdPartyPrefix {
 		return Import{Name: name, Alias: alias, IsStdLib: false}
 	}
 
