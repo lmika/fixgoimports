@@ -20,5 +20,6 @@ directory that begins with `.` or `_`, or any directory with the name `vendor`.
 
 ## Limitations
 
-- Only recognises `import ( ... )` blocks and can only handle a single import block at a time.
-- Cannot determine whether an import block appears in a string or not.
+- ~~Only recognises `import ( ... )` blocks and can only handle a single import block at a time.~~
+- ~~Cannot determine whether an import block appears in a string or not.~~
+- Does not preserve comments when importing "C", for use with cgo.

@@ -52,6 +52,8 @@ func (ec executionContext) processFile(filename string) error {
 		return errors.Wrap(err, "cannot read file")
 	}
 
+	gf.SortImportsInPlace()
+
 	formattedFile := new(bytes.Buffer)
 	if err := gf.Format(formattedFile); err != nil {
 		return errors.Wrap(err, "cannot format file")

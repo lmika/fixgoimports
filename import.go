@@ -3,54 +3,21 @@ package main
 import (
 	"fmt"
 	"io"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
-var knownPrefixes = map[string]struct{}{
+var known3rdPartyPrefixes = map[string]struct{}{
 	"github.com":    {},
 	"bitbucket.org": {},
 	"pkg.go.dev":    {},
 }
 
-var blockImportName = regexp.MustCompile(`([.]|[a-zA-Z_][a-zA-Z0-9_]*)?\s*("[^"]*")`)
-
 type Import struct {
 	Name     string
 	Alias    string
 	IsStdLib bool
-}
-
-var errBlank = errors.New("blank line")
-
-func FromSourceLine(line string) (Import, error) {
-	trimmedLine := strings.TrimSpace(line)
-	if trimmedLine == "" {
-		return Import{}, errBlank
-	}
-
-	submatches := blockImportName.FindStringSubmatch(trimmedLine)
-	var quotedImport, alias string
-	switch len(submatches) {
-	case 2:
-		quotedImport = submatches[1]
-	case 3:
-		alias = submatches[1]
-		quotedImport = submatches[2]
-	default:
-		return Import{}, errors.Errorf("malformed line: %v", submatches)
-	}
-
-	unquotedImport, err := strconv.Unquote(quotedImport)
-	if err != nil {
-		return Import{}, err
-	}
-
-	return NewImport(unquotedImport, alias), nil
 }
 
 func NewImport(name, alias string) Import {
@@ -59,7 +26,7 @@ func NewImport(name, alias string) Import {
 		return Import{Name: name, Alias: alias, IsStdLib: true}
 	}
 
-	if _, isKnownPrefix := knownPrefixes[firstSlash[0]]; isKnownPrefix {
+	if _, isKnown3rdPartyPrefix := known3rdPartyPrefixes[firstSlash[0]]; isKnown3rdPartyPrefix {
 		return Import{Name: name, Alias: alias, IsStdLib: false}
 	}
 
@@ -69,6 +36,15 @@ func NewImport(name, alias string) Import {
 	}
 
 	return Import{Name: name, Alias: alias, IsStdLib: true}
+}
+
+func (imp Import) Format(w io.Writer) (err error) {
+	if imp.Alias != "" {
+		_, err = fmt.Fprintf(w, "%v %v", imp.Alias, strconv.Quote(imp.Name))
+	} else {
+		_, err = fmt.Fprint(w, strconv.Quote(imp.Name))
+	}
+	return
 }
 
 type Imports []Import
@@ -94,14 +70,15 @@ func (imps Imports) Format(w io.Writer) error {
 			}
 		}
 		lastStdLib = imp.IsStdLib
-		if imp.Alias != "" {
-			if _, err := fmt.Fprintf(w, "\t%v %v\n", imp.Alias, strconv.Quote(imp.Name)); err != nil {
-				return err
-			}
-		} else {
-			if _, err := fmt.Fprintf(w, "\t%v\n", strconv.Quote(imp.Name)); err != nil {
-				return err
-			}
+
+		if _, err := io.WriteString(w, "\t"); err != nil {
+			return err
+		}
+		if err := imp.Format(w); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, "\n"); err != nil {
+			return err
 		}
 	}
 	return nil
