@@ -12,9 +12,10 @@ import (
 )
 
 type executionContext struct {
-	writeBack       bool
-	listFilesDiffer bool
-	errorPresenter  *errorPresenter
+	writeBack        bool
+	listFilesDiffer  bool
+	errorPresenter   *errorPresenter
+	shouldIgnoreFile func(filename string) bool
 }
 
 func (ec executionContext) processDir(dirName string) error {
@@ -94,7 +95,7 @@ func (executionContext) processStdin() error {
 	return nil
 }
 
-func (executionContext) shouldProcessFileOrDir(info os.FileInfo) bool {
+func (ec executionContext) shouldProcessFileOrDir(info os.FileInfo) bool {
 	filename := info.Name()
 
 	// Visit the current directory
@@ -114,6 +115,11 @@ func (executionContext) shouldProcessFileOrDir(info os.FileInfo) bool {
 
 	// Skip regular files that do not end in '.go'
 	if !info.IsDir() && filepath.Ext(filename) != ".go" {
+		return false
+	}
+
+	// Additional filter
+	if (ec.shouldIgnoreFile != nil) && ec.shouldIgnoreFile(filename) {
 		return false
 	}
 

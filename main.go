@@ -10,6 +10,7 @@ func main() {
 	var flagListDifferences = flag.Bool("l", false, "list files that differ from the formatted file")
 	var flagWriteBack = flag.Bool("w", false, "write result to (source) file instead of stdout")
 	var flagVerbose = flag.Bool("v", false, "verbose mode")
+	var flagIgnoreFile = flag.String("X", "", "ignore files matching glob expression")
 	flag.Parse()
 
 	errs := &errorPresenter{
@@ -19,6 +20,12 @@ func main() {
 		writeBack:       *flagWriteBack,
 		listFilesDiffer: *flagListDifferences,
 		errorPresenter:  errs,
+	}
+	if *flagIgnoreFile != "" {
+		execContext.shouldIgnoreFile = func(filename string) bool {
+			matched, err := filepath.Match(*flagIgnoreFile, filename)
+			return (err == nil) && matched
+		}
 	}
 
 	if flag.NArg() == 0 {
